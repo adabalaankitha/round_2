@@ -1,0 +1,102 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        canvas {
+            border: 1px solid #000;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Snake Game</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let snake = [];
+        let food = { x: 0, y: 0 };
+        let direction = 'right';
+
+        function initialize() {
+            snake = [];
+            snake[0] = { x: 10, y: 10 };
+            food = generateFood();
+            direction = 'right';
+        }
+
+        function generateFood() {
+            const x = Math.floor(Math.random() * 20) * 20;
+            const y = Math.floor(Math.random() * 20) * 20;
+            return { x, y };
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw snake
+            snake.forEach(segment => {
+                ctx.fillStyle = 'green';
+                ctx.fillRect(segment.x, segment.y, 20, 20);
+            });
+
+            // Draw food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x, food.y, 20, 20);
+        }
+
+        function move() {
+            let headX = snake[0].x;
+            let headY = snake[0].y;
+
+            if (direction === 'right') headX += 20;
+            if (direction === 'left') headX -= 20;
+            if (direction === 'up') headY -= 20;
+            if (direction === 'down') headY += 20;
+
+            if (headX === canvas.width) headX = 0;
+            if (headX < 0) headX = canvas.width - 20;
+            if (headY === canvas.height) headY = 0;
+            if (headY < 0) headY = canvas.height - 20;
+
+            const newHead = { x: headX, y: headY };
+            snake.unshift(newHead);
+
+            if (headX === food.x && headY === food.y) {
+                food = generateFood();
+            } else {
+                snake.pop();
+            }
+        }
+
+        function gameLoop() {
+            draw();
+            move();
+            setTimeout(gameLoop, 100);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowUp' && direction !== 'down') direction = 'up';
+            if (event.key === 'ArrowDown' && direction !== 'up') direction = 'down';
+            if (event.key === 'ArrowLeft' && direction !== 'right') direction = 'left';
+            if (event.key === 'ArrowRight' && direction !== 'left') direction = 'right';
+        });
+
+        initialize();
+        gameLoop();
+    </script>
+</body>
+</html>
+
